@@ -239,7 +239,7 @@ class AdminService:
 
             # Generate JWT
             token_data = {
-                "uuid": admin["uuid"],
+                "admin_id": admin["uuid"],   # matches get_current_admin
                 "email": admin["email"]
             }
 
@@ -247,7 +247,8 @@ class AdminService:
 
             access_token = await create_access_token(data=token_data)
 
-            logger.info(f"JWT created with email: {admin['email']} : {access_token}")
+            logger.info(f"JWT created for admin {admin['uuid']} : {access_token}")
+
             return OutModel(
                 status="success",
                 status_code=200,
