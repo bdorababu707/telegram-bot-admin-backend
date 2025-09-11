@@ -23,6 +23,7 @@ class DatabaseTables(BaseModel):
     TRANSACTIONS: str = os.getenv("TRANSACTIONS")
     INVENTORY: str = os.getenv("INVENTORY")
     ORDER_TRANSACTIONS: str = os.getenv("ORDER_TRANSACTIONS")
+    WALLET_TRANSACTIONS: str = os.getenv("WALLET_TRANSACTIONS")
 
 
 class DatabaseConfig(BaseModel):

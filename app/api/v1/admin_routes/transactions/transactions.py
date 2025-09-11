@@ -25,7 +25,7 @@ async def admin_get_transactions(
             status="error",
             status_code=500,
             comment=f"Failed to fetch transactions: {str(e)}",
-            data=None
+            data=[]
         )
 
 @router.get("/get-transaction/id", response_model=OutModel)
@@ -42,7 +42,7 @@ async def admin_get_transaction_by_id(
             status="error",
             status_code=500,
             comment=f"Failed to fetch transaction: {str(e)}",
-            data=None
+            data=[]
         )
     
 @router.get("/get-transaction/user-id", response_model=OutModel)
@@ -65,5 +65,5 @@ async def admin_get_transactions_by_user_id(
             status="error",
             status_code=500,
             comment=f"Failed to fetch transactions for user: {str(e)}",
-            data=None
+            data=[]
         )
