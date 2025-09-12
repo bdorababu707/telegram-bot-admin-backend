@@ -28,7 +28,7 @@ async def get_user_by_id(user_id: str = Query(..., description="Id of the user")
     current_admin=Depends(get_current_admin)
     ):
     try:
-        user = AdminUserService.get_user_by_id(user_id)
+        user = await AdminUserService.get_user_by_id(user_id)
         return user
 
     except Exception as e:
