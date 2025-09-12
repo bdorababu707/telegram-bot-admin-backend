@@ -74,3 +74,19 @@ async def update_user_status(
             comment="Failed to update user status",
             data=str(e)
         )   
+    
+@router.get("/user/overview", response_model=OutModel)
+async def get_user_overview(
+    user_id: str = Query(..., description="ID of the user to fetch overview for"),
+    current_admin=Depends(get_current_admin)
+):
+    try:
+        response = await AdminUserService.get_user_overview(user_id=user_id)
+        return response
+    except Exception as e:
+        return OutModel(
+            status="error",
+            status_code=500,
+            comment="Failed to fetch user dashboard",
+            data=str(e)
+        )

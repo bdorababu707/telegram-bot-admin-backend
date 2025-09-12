@@ -21,7 +21,7 @@ async def admin_add_funds_to_wallet(
             status="error",
             status_code=500,
             comment=f"Failed to add funds: {str(e)}",
-            data=None
+            data=""
         )
     
 @router.get("/get-user-wallet")
@@ -39,5 +39,5 @@ async def get_user_wallet(
             status="error",
             status_code=500,
             comment=f"Failed to fetch wallet: {str(e)}",
-            data=None
+            data=""
         )

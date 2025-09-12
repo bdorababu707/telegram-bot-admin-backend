@@ -89,7 +89,7 @@ class WalletService:
                     status="error",
                     status_code=404,
                     comment="Wallet not found for the given user_id",
-                    data=None
+                    data=""
                 )
 
             logger.info(f"Wallet fetched successfully for user_id {user_id}")

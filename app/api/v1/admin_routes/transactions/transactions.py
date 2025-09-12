@@ -67,3 +67,45 @@ async def admin_get_transactions_by_user_id(
             comment=f"Failed to fetch transactions for user: {str(e)}",
             data=[]
         )
+    
+@router.get("/get-transactions/buy", response_model=OutModel)
+async def admin_get_all_buy_transactions(
+    limit: int = Query(10, description="Number of records to fetch"),
+    skip: int = Query(0, description="Number of records to skip"),
+    current_admin: dict = Depends(get_current_admin)
+):
+    try:
+        response = await TransactionService.get_all_buy_transactions(
+            limit=limit,
+            skip=skip
+        )
+        return OutModel(**response)
+
+    except Exception as e:
+        return OutModel(
+            status="error",
+            status_code=500,
+            comment=f"Failed to fetch buy transactions: {str(e)}",
+            data=[]
+        )
+
+@router.get("/get-transactions/sell", response_model=OutModel)
+async def admin_get_all_sell_transactions(
+    limit: int = Query(10, description="Number of records to fetch"),
+    skip: int = Query(0, description="Number of records to skip"),
+    current_admin: dict = Depends(get_current_admin)
+):
+    try:
+        response = await TransactionService.get_all_sell_transactions(
+            limit=limit,
+            skip=skip
+        )
+        return OutModel(**response)
+
+    except Exception as e:
+        return OutModel(
+            status="error",
+            status_code=500,
+            comment=f"Failed to fetch sell transactions: {str(e)}",
+            data=[]
+        )

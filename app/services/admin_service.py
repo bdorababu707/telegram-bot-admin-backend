@@ -23,7 +23,7 @@ class AdminService:
                 status="failure",
                 status_code=403,
                 comment="Invalid secret key",
-                data=None,
+                data="",
             )
 
         # Check duplicate email
@@ -36,7 +36,7 @@ class AdminService:
                 status="failure",
                 status_code=400,
                 comment="Email already exists",
-                data=None,
+                data="",
             )
 
         # Check duplicate phone
@@ -49,7 +49,7 @@ class AdminService:
                 status="failure",
                 status_code=400,
                 comment="Phone number already exists",
-                data=None,
+                data="",
             )
 
         now = int(time.time())
@@ -100,7 +100,7 @@ class AdminService:
                     status="failure",
                     status_code=403,
                     comment="Access Denied. You dont have permission to create Admins",
-                    data=None
+                    data=""
                 )
 
             # Check email duplication
@@ -112,7 +112,7 @@ class AdminService:
                     status="failure",
                     status_code=400,
                     comment="Email already exists",
-                    data=None
+                    data=""
                 )
 
             # Check phone duplication
@@ -125,7 +125,7 @@ class AdminService:
                     status="failure",
                     status_code=400,
                     comment="Phone number already exists",
-                    data=None
+                    data=""
                 )
             
             now = int(time.time())
@@ -168,7 +168,7 @@ class AdminService:
                 status="error",
                 status_code=500,
                 comment=f"Failed to create admin: {str(e)}",
-                data=None,
+                data="",
             )
         
     @staticmethod
@@ -186,7 +186,7 @@ class AdminService:
                     status="failure",
                     status_code=404,
                     comment="User not found",
-                    data=None
+                    data=""
                 )
 
             feilds_to_remove = ["_id", "created_at", "updated_at", "password"]
@@ -206,7 +206,7 @@ class AdminService:
                 status="error",
                 status_code=500,
                 comment=f"Failed to fetch current user details: {str(e)}",
-                data=None
+                data=""
             )
         
     @staticmethod
@@ -224,7 +224,7 @@ class AdminService:
                     status="error",
                     status_code=404,
                     comment="Invalid email or password",
-                    data=None
+                    data=""
                 )
 
             # Verify password
@@ -234,7 +234,7 @@ class AdminService:
                     status="error",
                     status_code=401,
                     comment="Invalid email or password",
-                    data=None
+                    data=""
                 )
 
             # Generate JWT
@@ -268,5 +268,5 @@ class AdminService:
                 status="error",
                 status_code=500,
                 comment=f"Failed to login admin: {str(e)}",
-                data=None
+                data=""
             )

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 from app.db.mongo.helper import MongoHelper
 from app.models.base import OutModel
 from app.utils.logging import get_logger
@@ -78,7 +78,7 @@ class AdminUserService:
                     "status": "error",
                     "status_code": 404,
                     "comment": "User not found",
-                    "data": None
+                    "data": ""
                 }
 
             # Get wallet balance
@@ -127,7 +127,7 @@ class AdminUserService:
             result = await MongoHelper.update_one(
                 settings.DB_TABLE.USERS, 
                 {"uuid": user_id}, 
-                {"$set": {"status": "APPROVED", "updated_at": int(time.time())}}
+                {"$set": {"status": "APPROVED", "updated_at": int(time.time()), "metadata": {"approved_by": admin.get("uuid"), "approved_at": int(time.time())}}}
             )
 
             if result > 0:
@@ -170,7 +170,7 @@ class AdminUserService:
                     status="error",
                     status_code=404,
                     comment="User not found",
-                    data=None
+                    data=""
                 )
 
             logger.info(f"User fetched successfully with ID: {user_id}")
@@ -187,5 +187,53 @@ class AdminUserService:
                 status="error",
                 status_code=500,
                 comment="Internal server error while fetching user",
-                data=None
+                data=""
+            )
+
+    @staticmethod
+    async def get_user_overview(user_id: str) -> OutModel:
+        try:
+            logger.info(f"Fetching overview for user_id: {user_id}")
+
+            # Fetch user details
+            logger.info(f"Fetching user details for user_id: {user_id}")
+            user = await MongoHelper.find_one(settings.DB_TABLE.USERS, {"uuid": user_id}, projection={"_id": 0})
+            if not user:
+                logger.warning(f"User not found for user_id: {user_id}")
+                return OutModel(
+                    status="error",
+                    status_code=404,
+                    comment="User not found",
+                    data=""
+                )
+
+            # Fetch wallet details
+            logger.info(f"Fetching wallet for user_id: {user_id}")
+            wallet = await MongoHelper.find_one(settings.DB_TABLE.WALLETS, {"user_id": user_id}, projection={"_id": 0}) or {}
+
+            # Fetch transactions (all: buy, sell, closed)
+            logger.info(f"Fetching transactions for user_id: {user_id}")
+            transactions = await MongoHelper.find_many(settings.DB_TABLE.TRANSACTIONS, {"user_id": user_id}, projection={"_id": 0}, sort=[("created_at", -1)]) or []
+
+            response: Dict[str, Any] = {
+                "user": user,
+                "wallet": wallet,
+                "transactions": transactions,
+            }
+            
+            logger.info(f"User dashboard fetched successfully for user_id: {user_id}")
+            return OutModel(
+                status="success",
+                status_code=200,
+                comment="User dashboard fetched successfully",
+                data=response
+            )
+
+        except Exception as e:
+            logger.error(f"Error fetching user dashboard for {user_id}: {str(e)}")
+            return OutModel(
+                status="error",
+                status_code=500,
+                comment="Failed to fetch user dashboard",
+                data=str(e)
             )
