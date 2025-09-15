@@ -63,6 +63,10 @@ class AppConfig(BaseModel):
     DOCS_URL: str = "/docs"
     REDOC_URL: str = "/redoc"
 
+class TelegramConfig(BaseModel):
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
+    BOT_MODE: str = "polling"
+
 class LoggingConfig(BaseModel):
     LEVEL: str = "info"
     FILE_PATH: str = "../logs"
@@ -88,6 +92,7 @@ class Settings(BaseSettings):
     JWT: Jwt = Jwt()
     DB_TABLE: DatabaseTables = DatabaseTables()
     S3_CREDENTIALS: S3Credentials = S3Credentials()
+    TELEGRAM: TelegramConfig = TelegramConfig()
     SECRET_KEYS: SecretKeys = SecretKeys()
     model_config = SettingsConfigDict(
         env_file='.env',

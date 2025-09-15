@@ -60,12 +60,12 @@ async def get_all_users(
         )
 
 @router.patch("/approve-user")
-async def update_user_status(
-    user_id: str = Query(..., description="ID of the user to update"),
+async def approve_user(
+    user_id: str = Query(..., description="ID of the user to approve"),
     current_admin=Depends(get_current_admin)
 ):
     try:
-        response = await AdminUserService.update_user_status(user_id=user_id, admin=current_admin)
+        response = await AdminUserService.approve_user(user_id=user_id, admin=current_admin)
         return response
     except Exception as e:
         return OutModel(
@@ -74,6 +74,22 @@ async def update_user_status(
             comment="Failed to update user status",
             data=str(e)
         )   
+
+@router.post("/notify-user")
+async def notify_user(
+    telegram_id: int = Query(..., description="Telegram ID of the user to notify"),
+    current_admin=Depends(get_current_admin)
+):
+    try:
+        response = await AdminUserService.notify_user(telegram_id=telegram_id)
+        return response
+    except Exception as e:
+        return OutModel(
+            status="error",
+            status_code=500,
+            comment="Failed to send notification",
+            data=str(e)
+        )
     
 @router.get("/user/overview", response_model=OutModel)
 async def get_user_overview(

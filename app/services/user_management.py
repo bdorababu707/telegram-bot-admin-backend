@@ -1,4 +1,5 @@
 from typing import Any, Dict, Optional
+from aiogram import Bot
 from app.db.mongo.helper import MongoHelper
 from app.models.base import OutModel
 from app.utils.logging import get_logger
@@ -109,10 +110,10 @@ class AdminUserService:
             }
 
     @staticmethod
-    async def update_user_status(user_id: str, admin: dict) -> OutModel:
+    async def approve_user(user_id: str, admin: dict) -> OutModel:
         try:
+            logger.info(f"Admin {admin.get('uuid')} is approving user {user_id}.")
 
-            logger.info(f"Admin {admin.get('uuid')} is updating user {user_id} status.")
             # Fetch existing user
             user = await MongoHelper.find_one(settings.DB_TABLE.USERS, {"uuid": user_id})
             if not user:
@@ -124,19 +125,45 @@ class AdminUserService:
                     data=""
                 )
             
+            # Update user status to APPROVED
             result = await MongoHelper.update_one(
                 settings.DB_TABLE.USERS, 
                 {"uuid": user_id}, 
-                {"$set": {"status": "APPROVED", "updated_at": int(time.time()), "metadata": {"approved_by": admin.get("uuid"), "approved_at": int(time.time())}}}
+                {"$set": {
+                    "status": "APPROVED",
+                    "updated_at": int(time.time()),
+                    "metadata": {
+                        "approved_by": admin.get("uuid"),
+                        "approved_at": int(time.time())
+                    }
+                }}
             )
 
             if result > 0:
                 logger.info(f"Successfully updated user {user_id} status to APPROVED.")
+
+                # Handle notification
+                user_notified = "NO"
+                if user.get("telegram_id"):
+                    notify_response = await AdminUserService.notify_user(user.get("telegram_id"))
+                    if notify_response.status == "success":
+                        user_notified = "YES"
+                        logger.info(f"Notification sent to user {user_id}.")
+                    else:
+                        user_notified = "FAILED"
+                        logger.warning(f"Notification failed for user {user_id}: {notify_response.comment}")
+                else:
+                    logger.warning(f"User {user_id} does not have a telegram_id. Cannot send notification.")
+
                 return OutModel(
                     status="success",
                     status_code=200,
                     comment=f"User status updated to APPROVED",
-                    data={"user_id": user_id, "new_status": "APPROVED"}
+                    data={
+                        "user_id": user_id,
+                        "new_status": "APPROVED",
+                        "user_notified": user_notified
+                    }
                 )
             else:
                 logger.warning(f"Update failed for user {user_id}.")
@@ -148,7 +175,7 @@ class AdminUserService:
                 )
             
         except Exception as e:
-            logger.error(f"Error updating user status: {e}")
+            logger.error(f"Error updating user status: {e}", exc_info=True)
             return OutModel(
                 status="error",
                 status_code=500,
@@ -237,3 +264,39 @@ class AdminUserService:
                 comment="Failed to fetch user dashboard",
                 data=str(e)
             )
+        
+    @staticmethod
+    async def notify_user(telegram_id: int) -> OutModel:
+        try:
+            logger.info(f"Sending notification to telegram_id={telegram_id}")
+
+            message = "Your account has been approved! You can now start using our services."
+            telegram_user = await MongoHelper.find_one(settings.DB_TABLE.USERS, {"telegram_id": telegram_id})
+            if not telegram_user:
+                logger.warning(f"Telegram user not found with telegram_id={telegram_id}")
+                return OutModel(
+                    status="error",
+                    status_code=404,
+                    comment="Telegram user not found",
+                    data=""
+                )
+            
+            async with Bot(token=settings.TELEGRAM.TELEGRAM_BOT_TOKEN) as bot:
+                await bot.send_message(chat_id=telegram_id, text=message)
+
+            logger.info(f"Notification sent to telegram_id={telegram_id}")
+            return OutModel(
+                status="success",
+                status_code=200,
+                comment="Notification sent successfully",
+                data=""
+            )
+        except Exception as e:
+            logger.error("Failed to send notification: %s", str(e))
+            return OutModel(
+                status="error",
+                status_code=500,
+                comment="Failed to send notification",
+                data=str(e)
+            )
+        
