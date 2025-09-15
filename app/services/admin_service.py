@@ -95,7 +95,7 @@ class AdminService:
     async def create_admin_service(current_admin: dict, payload: CreateAdmin) -> dict:
         try:
             # Check permission
-            if current_admin.get("user_type") != "DEPT_ADMIN":
+            if current_admin.get("user_type") != "SUPER_ADMIN":
                 return OutModel(
                     status="failure",
                     status_code=403,
@@ -141,7 +141,6 @@ class AdminService:
                 password=await hash_password(payload.password),
                 user_type="ADMIN",
                 user_roles=payload.user_roles,
-                company_id=current_admin["company_id"],
                 created_by=current_admin["uuid"],
                 created_at=now,
                 updated_at=now,

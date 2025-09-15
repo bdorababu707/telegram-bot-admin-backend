@@ -136,16 +136,18 @@ class DashboardService:
             trx_result = await MongoHelper.aggregate(settings.DB_TABLE.TRANSACTIONS, transactions_pipeline)
             trx_data = trx_result[0] if trx_result else {}
 
-            # Extract results with fallbacks
-            total_buy_grams_count = trx_data.get("buy_count", [{}])[0].get("count", 0)
-            total_sell_grams_count = trx_data.get("sell_count", [{}])[0].get("count", 0)
-            total_closed_positions = trx_data.get("closed_count", [{}])[0].get("count", 0)
-            total_open_buy_grams = trx_data.get("buy_sum", [{}])[0].get("total", 0)
-            total_open_sell_grams = trx_data.get("sell_sum", [{}])[0].get("total", 0)
-            total_closed_buy_grams = trx_data.get("closed_buy_sum", [{}])[0].get("total", 0)
-            total_closed_sell_grams = trx_data.get("closed_sell_sum", [{}])[0].get("total", 0)
-            total_buy_grams = trx_data.get("total_buy_grams", [{}])[0].get("total", 0)
-            total_sell_grams = trx_data.get("total_sell_grams", [{}])[0].get("total", 0)
+            def safe_extract(data: list, key: str) -> int:
+                return data[0].get(key, 0) if data and isinstance(data[0], dict) else 0
+
+            total_buy_grams_count = safe_extract(trx_data.get("buy_count", []), "count")
+            total_sell_grams_count = safe_extract(trx_data.get("sell_count", []), "count")
+            total_closed_positions = safe_extract(trx_data.get("closed_count", []), "count")
+            total_open_buy_grams = safe_extract(trx_data.get("buy_sum", []), "total")
+            total_open_sell_grams = safe_extract(trx_data.get("sell_sum", []), "total")
+            total_closed_buy_grams = safe_extract(trx_data.get("closed_buy_sum", []), "total")
+            total_closed_sell_grams = safe_extract(trx_data.get("closed_sell_sum", []), "total")
+            total_buy_grams = safe_extract(trx_data.get("total_buy_grams", []), "total")
+            total_sell_grams = safe_extract(trx_data.get("total_sell_grams", []), "total")
 
 
             response: Dict[str, Any] = {

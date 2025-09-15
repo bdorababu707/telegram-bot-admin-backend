@@ -874,7 +874,7 @@ requires-dist = [
     { name = "pydantic", extras = ["email"], specifier = "==2.11.7" },
     { name = "pydantic-core", specifier = "==2.33.2" },
     { name = "pydantic-settings", specifier = "==2.10.1" },
-    { name = "pyjwt", specifier = ">=2.10.1" },
+    { name = "pyjwt", specifier = "==2.10.1" },
     { name = "pymongo", specifier = "==4.14.1" },
     { name = "python-dotenv", specifier = "==1.1.1" },
     { name = "python-multipart", specifier = ">=0.0.20" },

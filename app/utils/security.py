@@ -4,7 +4,7 @@ from typing import Annotated
 import jwt
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt import InvalidTokenError, ExpiredSignatureError, PyJWTError
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError, PyJWTError
 from app.db.mongo.helper import MongoHelper
 from app.utils.config import settings
 
