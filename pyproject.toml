@@ -24,7 +24,6 @@ dependencies = [
   "greenlet==3.2.4",
   "h11==0.16.0",
   "idna==3.10",
-  "jwt>=1.4.0",
   "magic-filter==1.0.12",
   "motor==3.7.1",
   "multidict==6.6.4",
